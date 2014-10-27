@@ -1,5 +1,5 @@
 module Bash
-  module Session
+  class Session
     VERSION = "0.0.1"
   end
 end
