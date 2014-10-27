@@ -11,7 +11,7 @@ module Bash
 
     def execute(command, options={})
       exit_status = 0
-      out = options[:out] || STDOUT
+      out = options[:out]
       cmd = command.dup
       cmd << ";" if cmd !~ /[;&]$/
       cmd << " DONTEVERUSETHIS=$?; echo #{@separator} $DONTEVERUSETHIS; echo \"exit $DONTEVERUSETHIS\"|sh"
@@ -23,7 +23,7 @@ module Bash
           exit_status = $1
           break
         else
-          out.puts data
+          out.puts data if out
         end
       end
 
