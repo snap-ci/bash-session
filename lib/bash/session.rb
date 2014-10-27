@@ -29,7 +29,7 @@ module Bash
         end
       end
 
-      exit_status
+      exit_status.to_i
     end
 
     private
