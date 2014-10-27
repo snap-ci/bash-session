@@ -9,9 +9,10 @@ module Bash
       @separator = SecureRandom.hex
     end
 
-    def execute(command, options={})
+    def execute(command, options={}, &callback)
       exit_status = 0
       out = options[:out]
+
       cmd = command.dup
       cmd << ";" if cmd !~ /[;&]$/
       cmd << " DONTEVERUSETHIS=$?; echo #{@separator} $DONTEVERUSETHIS; echo \"exit $DONTEVERUSETHIS\"|sh"
@@ -23,6 +24,7 @@ module Bash
           exit_status = $1
           break
         else
+          callback.call(data) if callback
           out.puts data if out
         end
       end
