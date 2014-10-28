@@ -10,7 +10,7 @@ module Bash
     end
 
     def execute(command, options={}, &callback)
-      exit_status = 0
+      exit_status = nil
       out = options[:out]
 
       cmd = command.dup
@@ -18,14 +18,18 @@ module Bash
       cmd << " DONTEVERUSETHIS=$?; echo #{@separator} $DONTEVERUSETHIS; echo \"exit $DONTEVERUSETHIS\"|sh"
 
       @write.puts(cmd)
-      loop do
-        data = @master.gets
-        if data.strip =~ /#{@separator} (\d+)$/
-          exit_status = $1
-          break
-        else
+      until exit_status do
+        begin
+          data = @master.read_nonblock(160000)
+          if data.strip =~ /#{@separator} (\d+)$/
+            exit_status = $1
+            data = data.gsub!(/#{@separator} (\d+)$/, '')
+          end
           callback.call(data) if callback
           out.puts data if out
+        rescue IO::WaitReadable
+          IO.select([@master])
+          retry
         end
       end
 
