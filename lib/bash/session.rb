@@ -15,15 +15,15 @@ module Bash
 
       cmd = command.dup
       cmd << ";" if cmd !~ /[;&]$/
-      cmd << " DONTEVERUSETHIS=$?; echo #{@separator} $DONTEVERUSETHIS; echo \"exit $DONTEVERUSETHIS\"|sh"
+      cmd << %Q{ DONTEVERUSETHIS=$?; echo "\n#{@separator} $DONTEVERUSETHIS"; echo "exit $DONTEVERUSETHIS"|sh}
 
       @write.puts(cmd)
       until exit_status do
         begin
           data = @master.read_nonblock(160000)
-          if data.strip =~ /#{@separator} (\d+)$/
+          if data.strip =~ /^#{@separator} (\d+)$/
             exit_status = $1
-            data = data.gsub!(/#{@separator} (\d+)$/, '')
+            data = data.gsub!(/^#{@separator} (\d+)$/, '')
           end
           callback.call(data) if callback
           out.puts data if out
