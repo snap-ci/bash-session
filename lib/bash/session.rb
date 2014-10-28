@@ -21,9 +21,9 @@ module Bash
       until exit_status do
         begin
           data = @master.read_nonblock(160000)
-          if data.strip =~ /^#{@separator} (\d+)$/
+          if data.strip =~ /^#{@separator} (\d+)\s*/
             exit_status = $1
-            data = data.gsub!(/^#{@separator} (\d+)$/, '')
+            data.gsub!(/^#{@separator} (\d+)\s*/, '')
           end
           callback.call(data) if callback
           out.puts data if out
