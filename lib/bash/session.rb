@@ -4,8 +4,11 @@ require 'pty'
 
 module Bash
   class Session
-    def initialize
+    class TimeoutError < StandardError; end
+
+    def initialize(timeout=nil)
       start_session
+      @timeout = timeout
       @separator = SecureRandom.hex
     end
 
@@ -28,8 +31,12 @@ module Bash
           callback.call(data) if callback
           out.puts data if out
         rescue IO::WaitReadable
-          IO.select([@master])
-          retry
+          ready = IO.select([@master], nil, nil, @timeout)
+          unless ready
+            raise TimeoutError.new("No output received for the last #{@timeout} seconds. Timing out..")
+          else
+            retry
+          end
         end
       end
 
