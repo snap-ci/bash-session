@@ -18,7 +18,8 @@ module Bash
 
       cmd = command.dup
       cmd << ";" if cmd !~ /[;&]$/
-      cmd << %Q{\nDONTEVERUSETHIS=$?; echo "\n#{@separator} $DONTEVERUSETHIS"; echo "exit $DONTEVERUSETHIS"|sh}
+      cmd << "\n" if cmd =~ /#/
+      cmd << %Q{DONTEVERUSETHIS=$?; echo "\n#{@separator} $DONTEVERUSETHIS"; echo "exit $DONTEVERUSETHIS"|sh}
 
       @write.puts(cmd)
       until exit_status do
