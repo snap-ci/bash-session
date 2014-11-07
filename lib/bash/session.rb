@@ -49,7 +49,7 @@ module Bash
     def start_session
       @master, slave = PTY.open
       read, @write = IO.pipe
-      spawn("bash", in: read, out: slave, err: slave)
+      spawn("bash | cat", in: read, out: slave, err: slave)
       read.close
       slave.close
     end
