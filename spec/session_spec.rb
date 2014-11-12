@@ -32,6 +32,13 @@ describe Bash::Session do
     @session.execute("echo $FOO") { |output| expect(output).to include("bar") }
   end
 
+  it 'should run multiple commands separated by a newline' do
+    reader, writer = IO.pipe
+    @session.execute("echo hi\necho bye", out: writer)
+    writer.close
+    expect(reader.read).to eq("hi\nbye\n")
+  end
+
   it 'should wait for long running commands to complete and then exit' do
     reader, writer = IO.pipe
     exit_status = @session.execute("for i in {1..5}; do echo -n 'hello world '; sleep 1; done", out: writer)
