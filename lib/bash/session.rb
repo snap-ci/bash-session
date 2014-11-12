@@ -1,6 +1,6 @@
 require "bash/session/version"
 require 'securerandom'
-require 'pty'
+require 'open3'
 
 module Bash
   class Session
@@ -21,18 +21,19 @@ module Bash
       cmd << "\n" if cmd =~ /#/
       cmd << %Q{DONTEVERUSETHIS=$?; echo "\n#{@separator} $DONTEVERUSETHIS"; echo "exit $DONTEVERUSETHIS"|sh}
 
-      @write.puts(cmd)
+      @stdin.puts(cmd)
+
       until exit_status do
         begin
-          data = @master.read_nonblock(160000)
+          data = @outstr.read_nonblock(160000)
           if data.strip =~ /^#{@separator} (\d+)\s*/
             exit_status = $1
-            data.gsub!(/^#{@separator} (\d+)\s*/, '')
+            data.gsub!(/\n^#{@separator} (\d+)\s*$/, '')
           end
           callback.call(data) if callback
           out.puts data if out
         rescue IO::WaitReadable
-          ready = IO.select([@master], nil, nil, @timeout)
+          ready = IO.select([@outstr], nil, nil, @timeout)
           unless ready
             raise TimeoutError.new("No output received for the last #{@timeout} seconds. Timing out..")
           else
@@ -47,11 +48,7 @@ module Bash
     private
 
     def start_session
-      @master, slave = PTY.open
-      read, @write = IO.pipe
-      spawn("bash | cat", in: read, out: slave, err: slave)
-      read.close
-      slave.close
+      @stdin, @outstr, @wait_thr = Open3.popen2e("bash")
     end
   end
 end
