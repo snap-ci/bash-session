@@ -31,7 +31,7 @@ module Bash
             data.gsub!(/\n^#{@separator} (\d+)\s*$/, '')
           end
           callback.call(data) if callback
-          out.puts data if out
+          out.write data if out
         rescue IO::WaitReadable
           ready = IO.select([@outstr], nil, nil, @timeout)
           unless ready
