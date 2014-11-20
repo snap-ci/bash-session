@@ -1,3 +1,5 @@
+[![Build Status](https://snap-ci.com/snap-ci/bash-session/branch/master/build_image)](https://snap-ci.com/snap-ci/bash-session/branch/master)
+
 # Bash::Session
 
 TODO: Write a gem description
