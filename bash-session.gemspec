@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Akshay Karle"]
   spec.email         = ["akshay.a.karle@gmail.com"]
   spec.summary       = %q{A minimalistic gem for a persistent bash session.}
-  spec.description   = %q{TODO: Write a longer description. Optional.}
+  spec.description   = ""
   spec.homepage      = ""
   spec.license       = "MIT"
 
