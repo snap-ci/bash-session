@@ -6,15 +6,16 @@ module Bash
   class Session
     class TimeoutError < StandardError; end
 
-    def initialize(timeout=nil)
+    def initialize(default_timeout=nil)
       start_session
-      @timeout = timeout
+      @default_timeout = default_timeout
       @separator = SecureRandom.hex
     end
 
     def execute(command, options={}, &callback)
       exit_status = nil
       out = options[:out]
+      timeout = options[:timeout] || @default_timeout
 
       cmd = command.dup
       cmd << ";" if cmd !~ /[;&]$/
@@ -33,9 +34,9 @@ module Bash
           callback.call(data) if callback
           out.write data if out
         rescue IO::WaitReadable
-          ready = IO.select([@outstr], nil, nil, @timeout)
+          ready = IO.select([@outstr], nil, nil, timeout)
           unless ready
-            raise TimeoutError.new("No output received for the last #{@timeout} seconds. Timing out..")
+            raise TimeoutError.new("No output received for the last #{timeout} seconds. Timing out...")
           else
             retry
           end
@@ -43,6 +44,15 @@ module Bash
       end
 
       exit_status.to_i
+    end
+
+    def close
+      return unless @wait_thr.alive?
+      return if (Process.kill('TERM', @wait_thr.pid) rescue nil)
+      return unless @wait_thr.alive?
+      return if (Process.kill('KILL', @wait_thr.pid) rescue nil)
+      return unless @wait_thr.alive?
+      raise "Could not kill process(PID #{@wait_thr.pid})"
     end
 
     private
