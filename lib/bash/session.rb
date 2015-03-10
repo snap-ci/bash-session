@@ -58,7 +58,7 @@ module Bash
     private
 
     def start_session
-      @stdin, @outstr, @wait_thr = Open3.popen2e("bash")
+      @stdin, @outstr, @wait_thr = Open3.popen2e("bash --login")
     end
   end
 end

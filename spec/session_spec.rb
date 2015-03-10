@@ -102,4 +102,12 @@ describe Bash::Session do
 
     expect(reader.read_nonblock(1000)).to eq("hi......bye\n")
   end
+
+  it 'should start a non-interactive login shell session' do
+    exit_status = @session.execute("[[ $- != *i* ]]")
+    expect(exit_status).to eq(0)
+
+    exit_status = @session.execute("shopt -q login_shell")
+    expect(exit_status).to eq(0)
+  end
 end
