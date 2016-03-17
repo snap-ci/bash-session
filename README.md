@@ -1,5 +1,7 @@
 [![Build Status](https://snap-ci.com/snap-ci/bash-session/branch/master/build_image)](https://snap-ci.com/snap-ci/bash-session/branch/master)
 
+To report an issue, [please contact the Snap.ci support team.](https://snap-ci.com/contact-us)
+
 # Bash::Session
 
 TODO: Write a gem description
