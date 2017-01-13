@@ -1,7 +1,7 @@
 require_relative 'test_helper'
 
 class BashSessionTest < Minitest::Test
-  parallelize_me!
+  parallelize_me! unless ENV["SNAP_CI"]
 
   def setup
     @session = Bash::Session.new
@@ -65,7 +65,7 @@ class BashSessionTest < Minitest::Test
 
     writer.close
 
-    assert_in_delta(3, end_time - begin_time, 1.0)
+    assert_in_delta(3, end_time - begin_time, 2.0)
     assert_equal 'No output received for the last 3 seconds. Timing out...', e.message
     assert_equal "hi\n", reader.read
   end
@@ -82,7 +82,7 @@ class BashSessionTest < Minitest::Test
 
     writer.close
 
-    assert_in_delta(3, end_time - begin_time, 1.0)
+    assert_in_delta(3, end_time - begin_time, 2.0)
     assert_equal 'No output received for the last 3 seconds. Timing out...', e.message
     assert_equal "hi\n", reader.read
   end
