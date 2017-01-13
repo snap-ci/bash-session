@@ -118,7 +118,7 @@ class BashSessionTest < Minitest::Test
   def assert_success_with_output(command, &block)
     output = ""
     status = @session.execute(command) { |out| output = out }
-    assert_equal 0, status
+    assert_equal 0, status, "command #{command} failed with status #{status}"
     yield output if block_given?
   end
 end
