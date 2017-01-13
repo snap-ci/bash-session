@@ -28,8 +28,8 @@ class BashSessionTest < Minitest::Test
   end
 
   def test_uses_same_session_and_preserves_state_through_sequential_commands
-    assert_success_with_output("cd #{Dir.pwd}/spec")
-    assert_success_with_output("pwd") { |output| assert_match("#{Dir.pwd}/spec", output) }
+    assert_success_with_output("cd #{Dir.pwd}/test")
+    assert_success_with_output("pwd") { |output| assert_match("#{Dir.pwd}/test", output) }
     assert_success_with_output("cd ~")
     assert_success_with_output("pwd") { |output| assert_match(Dir.home, output) }
     assert_success_with_output("echo $FOO") { |output| refute_match("bar", output) }
