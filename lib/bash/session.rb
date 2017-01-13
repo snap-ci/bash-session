@@ -6,6 +6,8 @@ module Bash
   class Session
     class TimeoutError < StandardError; end
 
+    attr_reader :default_timeout
+
     def initialize(default_timeout=nil)
       start_session
       @default_timeout = default_timeout

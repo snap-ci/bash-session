@@ -6,8 +6,8 @@ require 'bash/session/version'
 Gem::Specification.new do |spec|
   spec.name          = "bash-session"
   spec.version       = Bash::Session::VERSION
-  spec.authors       = ["Akshay Karle"]
-  spec.email         = ["akshay.a.karle@gmail.com"]
+  spec.authors       = ["Snap CI"]
+  spec.email         = ["support@snap-ci.com"]
   spec.summary       = %q{A minimalistic gem for a persistent bash session.}
   spec.description   = ""
   spec.homepage      = ""
@@ -23,5 +23,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "rake", "~> 10.0"
 
-  spec.add_development_dependency "rspec"
+  spec.add_development_dependency "minitest"
 end
