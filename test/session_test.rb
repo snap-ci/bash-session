@@ -1,6 +1,7 @@
 require_relative 'test_helper'
 
 class BashSessionTest < Minitest::Test
+  parallelize_me!
 
   def setup
     @session = Bash::Session.new
@@ -38,14 +39,14 @@ class BashSessionTest < Minitest::Test
   end
 
   def test_run_multiple_commands_separated_by_a_newline
-    reader, writer = IO.pipe
+    reader, writer = IO.pipe(Encoding::ASCII_8BIT)
     @session.execute("echo hi\necho bye", out: writer)
     writer.close
     assert_equal "hi\nbye\n", reader.read
   end
 
   def test_wait_for_long_running_commands_to_complete_and_then_exit
-    reader, writer = IO.pipe
+    reader, writer = IO.pipe(Encoding::ASCII_8BIT)
     exit_status = @session.execute("for i in {1..5}; do echo -n 'hello world '; sleep 1; done", out: writer)
     assert_equal 0, exit_status
     writer.close
@@ -54,7 +55,7 @@ class BashSessionTest < Minitest::Test
 
   def test_raise_error_when_command_does_not_generate_any_output_within_a_default_timeout_period
     @session = Bash::Session.new(3)
-    reader, writer = IO.pipe
+    reader, writer = IO.pipe(Encoding::ASCII_8BIT)
 
     begin_time = Time.now
     e = assert_raises(Bash::Session::TimeoutError) do
@@ -64,14 +65,14 @@ class BashSessionTest < Minitest::Test
 
     writer.close
 
-    # expect(end_time - begin_time).to be_within(0.1).of(3)
+    assert_in_delta(3, end_time - begin_time, 1.0)
     assert_equal 'No output received for the last 3 seconds. Timing out...', e.message
     assert_equal "hi\n", reader.read
   end
 
   def test_raise_error_when_command_does_not_generate_any_output_command_specific_timeout_period
     @session = Bash::Session.new(1)
-    reader, writer = IO.pipe
+    reader, writer = IO.pipe(Encoding::ASCII_8BIT)
 
     begin_time = Time.now
     e = assert_raises(Bash::Session::TimeoutError) do
@@ -81,14 +82,14 @@ class BashSessionTest < Minitest::Test
 
     writer.close
 
-    # expect(end_time - begin_time).to be_within(0.1).of(3)
+    assert_in_delta(3, end_time - begin_time, 1.0)
     assert_equal 'No output received for the last 3 seconds. Timing out...', e.message
     assert_equal "hi\n", reader.read
   end
 
   def test_not_raise_error_when_long_running_command_is_constantly_generating_output_with_default_timeout
     @session = Bash::Session.new(3)
-    reader, writer = IO.pipe
+    reader, writer = IO.pipe(Encoding::ASCII_8BIT)
 
     exit_status = @session.execute("echo -n hi; for i in {1..6}; do sleep 1; echo -n .; done; echo bye", out: writer)
     writer.close
@@ -99,7 +100,7 @@ class BashSessionTest < Minitest::Test
 
   def test_not_raise_error_when_long_running_command_is_constantly_generating_output_with_a_command_specific_timeout
     @session = Bash::Session.new(3)
-    reader, writer = IO.pipe
+    reader, writer = IO.pipe(Encoding::ASCII_8BIT)
 
     exit_status = @session.execute("echo -n hi; for i in {1..6}; do sleep 4; echo -n .; done; echo bye", out: writer, timeout: 5)
     writer.close
